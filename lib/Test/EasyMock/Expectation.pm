@@ -77,10 +77,10 @@ Retrieve a result value.
 
 =cut
 sub retrieve_result {
-    my ($self) = @_;
+    my ($self, $args) = @_;
     my $result = shift @{$self->{_results}} || $self->{_stub_result};
     croak('no result.') unless $result;
-    return $result->{code}->();
+    return $result->{code}->(@$args);
 }
 
 =head2 has_result

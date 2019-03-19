@@ -204,6 +204,18 @@ subtest 'default mock' => sub {
 
     reset($mock);
 
+    subtest 'modify caller arguments.' => sub {
+        expect($mock->read(undef, 5))
+            ->and_answer(sub { $_[0] = "hello" });
+        replay($mock);
+
+        $mock->read(my $buf, 5);
+        is($buf, "hello", '$buf');
+        verify($mock);
+    };
+
+    reset($mock);
+
     subtest 'and_stub_scalar_return' => sub {
         my $args1 = 'argument';
         my $result1_1 = 'a result of first.';

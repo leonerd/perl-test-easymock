@@ -61,6 +61,10 @@ sub and_list_return {
 
 Add a code to the expectation, it calculate an answer.
 
+Code is invoked with the original arguments:
+
+    $answer->(@_)
+
 =cut
 sub and_answer {
     my ($self, $code) = @_;

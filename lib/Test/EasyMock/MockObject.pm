@@ -35,7 +35,7 @@ Mock to I<can> method.
 =cut
 sub can {
     my $self = shift;
-    return $self->{_control}->process_method_invocation($self, 'can', @_);
+    return $self->{_control}->process_method_invocation($self, 'can', \@_);
 }
 
 =head2 AUTOLOAD
@@ -51,7 +51,7 @@ sub AUTOLOAD {
         $AUTOLOAD =~ m{::(\w+)\z}xms;
     };
     return if $sub eq 'DESTROY';
-    return $self->{_control}->process_method_invocation($self, $sub, @_);
+    return $self->{_control}->process_method_invocation($self, $sub, \@_);
 }
 
 1;

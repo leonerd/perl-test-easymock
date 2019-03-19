@@ -61,41 +61,41 @@ sub create_mock {
     }, 'Test::EasyMock::MockObject';
 }
 
-=head2 process_method_invocation($mock, $method, @args)
+=head2 process_method_invocation($mock, $method, $args)
 
 Process method invocation.
 Dispatch to replay or record method.
 
 =cut
 sub process_method_invocation {
-    my ($self, $mock, $method, @args) = @_;
+    my ($self, $mock, $method, $args) = @_;
     return $self->{_is_replay_mode}
-        ? $self->replay_method_invocation($mock, $method, @args)
-        : $self->record_method_invocation($mock, $method, @args);
+        ? $self->replay_method_invocation($mock, $method, $args)
+        : $self->record_method_invocation($mock, $method, $args);
 }
 
-=head2 replay_method_invocation($mock, $method, @args)
+=head2 replay_method_invocation($mock, $method, $args)
 
 Replay the method invocation.
 
 =cut
 sub replay_method_invocation {
-    my ($self, $mock, $method, @args) = @_;
+    my ($self, $mock, $method, $args) = @_;
     my $expectation = $self->find_expectation({
         mock => $mock,
         method => $method,
-        args => \@args,
+        args => $args,
     });
     my $object = $self->{_object};
 
-    my $method_detail = "(method: $method, args: " . pp(@args) . ')';
+    my $method_detail = "(method: $method, args: " . pp(@$args) . ')';
 
     if ($expectation) {
         $tb->ok(1, 'Expected mock method invoked.'.$method_detail);
-        return $expectation->retrieve_result();
+        return $expectation->retrieve_result($args);
     }
     elsif ($object && $object->can($method)) {
-        return $object->$method(@args);
+        return $object->$method(@$args);
     }
     else {
         $tb->ok(0, 'Unexpected mock method invoked.'.$method_detail);
@@ -103,18 +103,18 @@ sub replay_method_invocation {
     }
 }
 
-=head2 record_method_invocation($mock, $method, @args)
+=head2 record_method_invocation($mock, $method, $args)
 
 Record the method invocation.
 
 =cut
 sub record_method_invocation {
-    my ($self, $mock, $method, @args) = @_;
+    my ($self, $mock, $method, $args) = @_;
     my $expectation = Test::EasyMock::Expectation->new({
         method => $method,
-        args => is_instance($args[0], 'Test::EasyMock::ArgumentsMatcher')
-            ? $args[0]
-            : Test::EasyMock::ArgumentsMatcher->new(\@args),
+        args => is_instance($args->[0], 'Test::EasyMock::ArgumentsMatcher')
+            ? $args->[0]
+            : Test::EasyMock::ArgumentsMatcher->new($args),
     });
     return ($mock, $expectation);
 }
